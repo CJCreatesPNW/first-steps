@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Icon Generator</title>
+</head>
+<body>
+    <canvas id="canvas" width="512" height="512"></canvas>
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        
+        // Background
+        ctx.fillStyle = '#667eea';
+        ctx.fillRect(0, 0, 512, 512);
+        
+        // Emoji icon
+        ctx.font = '300px Arial';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('🚶', 256, 256);
+        
+        // Download link
+        canvas.toBlob(blob => {
+            const link = document.createElement('a');
+            link.download = 'icon-512.png';
+            link.href = URL.createObjectURL(blob);
+            link.textContent = 'Click to download icon';
+            document.body.appendChild(link);
+        });
+    </script>
+</body>
+</html>

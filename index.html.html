@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#667eea">
+    
+    <title>First Steps</title>
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="manifest.json">
+    
+    <!-- Apple touch icon -->
+    <link rel="apple-touch-icon" href="icon-192.png">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            min-height: -webkit-fill-available;
+            padding: env(safe-area-inset-top) 20px env(safe-area-inset-bottom) 20px;
+        }
+        
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 24px;
+            padding: 25px 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+        
+        .header h1 {
+            font-size: 32px;
+            color: #333;
+            margin-bottom: 5px;
+        }
+        
+        .header .subtitle {
+            color: #666;
+            font-size: 15px;
+            opacity: 0.8;
+        }
+        
+        /* Level Progress Dots */
+        .level-indicator {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 25px;
+            padding: 0 5px;
+        }
+        
+        .level-dot {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: white;
+            font-size: 14px;
+            transition: all 0.3s;
+            position: relative;
+        }
+        
+        .level-dot.completed {
+            background: #4CAF50;
+            box-shadow: 0 2px 8px rgba(76,175,80,0.3);
+        }
+        
+        .level-dot.current {
+            background: #FF9800;
+            box-shadow: 0 0 0 4px rgba(255,152,0,0.3);
+            animation: pulse 2s infinite;
+        }
+        
+        .level-dot.upcoming {
+            background: #E0E0E0;
+            color: #999;
+        }
+        
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(255,152,0,0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(255,152,0,0); }
+            100% { box-shadow: 0 0 0 0 rgba(255,152,0,0); }
+        }
+        
+        /* Main Progress Card */
+        .progress-card {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 20px;
+            padding: 30px 20px;
+            margin-bottom: 20px;
+            text-align: center;
+            border: 2px solid rgba(102, 126, 234, 0.1);
+        }
+        
+        .current-step-goal {
+            font-size: 80px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1;
+            margin-bottom: 5px;
+        }
+        
+        .step-label {
+            color: #666;
+            font-size: 16px;
+            margin-bottom: 20px;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 12px;
+            background: #e0e0e0;
+            border-radius: 10px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            border-radius: 10px;
+            transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 2px 8px rgba(102,126,234,0.3);
+        }
+        
+        .progress-text {
+            color: #666;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+        
+        /* Stats Row */
+        .info-row {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 20px;
+            background: #f8f9fa;
+            border-radius: 16px;
+            padding: 15px;
+        }
+        
+        .info-item {
+            text-align: center;
+        }
+        
+        .info-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .info-label {
+            font-size: 11px;
+            color: #666;
+            margin-top: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        /* Buttons */
+        .button-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 15px;
+        }
+        
+        .btn {
+            padding: 18px;
+            border: none;
+            border-radius: 14px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+        }
+        
+        .btn:active {
+            transform: scale(0.96);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            box-shadow: 0 4px 15px rgba(102,126,234,0.3);
+        }
+        
+        .btn-success {
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            color: white;
+            box-shadow: 0 4px 15px rgba(76,175,80,0.3);
+        }
+        
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #333;
+        }
+        
+        .btn-full {
+            grid-column: 1 / -1;
+        }
+        
+        /* Level Details */
+        .level-details {
+            background: #f8f9fa;
+            border-radius: 16px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+        
+        .level-details h3 {
+            margin-bottom: 15px;
+            color: #333;
+            font-size: 18px;
+        }
+        
+        .day-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 15px;
+            margin: 5px 0;
+            border-radius: 10px;
+            background: white;
+            transition: all 0.3s;
+        }
+        
+        .day-row.completed-day {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+        
+        .day-row.current-day {
+            background: linear-gradient(135deg, #fff3e0, #ffe0b2);
+            font-weight: bold;
+            border: 2px solid #FF9800;
+            box-shadow: 0 2px 8px rgba(255,152,0,0.2);
+        }
+        
+        .motivation {
+            text-align: center;
+            color: #555;
+            font-style: italic;
+            margin-top: 20px;
+            padding: 15px;
+            background: linear-gradient(135deg, #f0f4ff, #e8edff);
+            border-radius: 12px;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        
+        /* Install Prompt */
+        .install-prompt {
+            display: none;
+            background: #667eea;
+            color: white;
+            text-align: center;
+            padding: 12px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="install-prompt" id="installPrompt">
+            📲 Tap to install this app on your phone
+        </div>
+        
+        <div class="header">
+            <h1>🚶 First Steps</h1>
+            <p class="subtitle">Gentle Walking Program</p>
+        </div>
+        
+        <div class="level-indicator" id="levelDots"></div>
+        
+        <div class="progress-card">
+            <div class="current-step-goal" id="currentGoal">20</div>
+            <div class="step-label">steps today</div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+            </div>
+            <div class="progress-text" id="progressText">0 of 20 steps completed</div>
+        </div>
+        
+        <div class="info-row">
+            <div class="info-item">
+                <div class="info-value" id="totalSteps">0</div>
+                <div class="info-label">Total Steps</div>
+            </div>
+            <div class="info-item">
+                <div class="info-value" id="currentStreak">0</div>
+                <div class="info-label">Day Streak</div>
+            </div>
+            <div class="info-item">
+                <div class="info-value" id="levelDisplay">1</div>
+                <div class="info-label">Level</div>
+            </div>
+        </div>
+        
+        <div class="button-group">
+            <button class="btn btn-primary" onclick="addSteps(1)">+1 Step</button>
+            <button class="btn btn-primary" onclick="addSteps(5)">+5 Steps</button>
+            <button class="btn btn-success btn-full" onclick="completeDay()">✅ Complete Day</button>
+        </div>
+        
+        <button class="btn btn-secondary btn-full" onclick="resetProgress()" style="margin-top: 10px;">🔄 Reset Program</button>
+        
+        <div class="level-details" id="levelDetails"></div>
+        
+        <div class="motivation" id="motivation">
+            "Every journey begins with a single step. You've got this! 🌟"
+        </div>
+    </div>
+
+    <script>
+        // Register Service Worker for offline support
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js').catch(err => {
+                    console.log('ServiceWorker registration failed: ', err);
+                });
+            });
+        }
+        
+        // Handle PWA install prompt
+        let deferredPrompt;
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            document.getElementById('installPrompt').style.display = 'block';
+            
+            document.getElementById('installPrompt').addEventListener('click', () => {
+                deferredPrompt.prompt();
+                deferredPrompt.userChoice.then((choiceResult) => {
+                    if (choiceResult.outcome === 'accepted') {
+                        console.log('User accepted the install prompt');
+                    }
+                    deferredPrompt = null;
+                    document.getElementById('installPrompt').style.display = 'none';
+                });
+            });
+        });
+
+        // Level definitions
+        const levels = [
+            {
+                name: "Gentle Beginnings",
+                days: [
+                    { day: 1, steps: 20, description: "Just 20 steps" },
+                    { day: 2, steps: 20, description: "Repeat 20 steps" },
+                    { day: 3, steps: 50, description: "Increase to 50" },
+                    { day: 4, steps: 50, description: "Repeat 50 steps" },
+                    { day: 5, steps: 100, description: "First milestone!" }
+                ]
+            },
+            {
+                name: "Finding Your Rhythm",
+                days: [
+                    { day: 1, steps: 100, description: "Start at 100" },
+                    { day: 2, steps: 150, description: "Increase to 150" },
+                    { day: 3, steps: 150, description: "Repeat 150" },
+                    { day: 4, steps: 200, description: "Push to 200" },
+                    { day: 5, steps: 250, description: "Almost at 300!" }
+                ]
+            },
+            {
+                name: "Building Momentum",
+                days: [
+                    { day: 1, steps: 300, description: "300 steps" },
+                    { day: 2, steps: 400, description: "400 steps" },
+                    { day: 3, steps: 400, description: "Repeat 400" },
+                    { day: 4, steps: 500, description: "Half thousand!" },
+                    { day: 5, steps: 600, description: "600 steps" }
+                ]
+            },
+            {
+                name: "Steady Progress",
+                days: [
+                    { day: 1, steps: 700, description: "700 steps" },
+                    { day: 2, steps: 800, description: "800 steps" },
+                    { day: 3, steps: 900, description: "900 steps" },
+                    { day: 4, steps: 1000, description: "🎉 1,000 steps!" },
+                    { day: 5, steps: 1200, description: "1,200 steps" }
+                ]
+            },
+            {
+                name: "Picking Up Speed",
+                days: [
+                    { day: 1, steps: 1500, description: "1,500 steps" },
+                    { day: 2, steps: 1800, description: "1,800 steps" },
+                    { day: 3, steps: 2000, description: "2,000 steps!" },
+                    { day: 4, steps: 2500, description: "2,500 steps" },
+                    { day: 5, steps: 3000, description: "3,000 steps!" }
+                ]
+            },
+            {
+                name: "Almost There!",
+                days: [
+                    { day: 1, steps: 3500, description: "3,500 steps" },
+                    { day: 2, steps: 4000, description: "4,000 steps" },
+                    { day: 3, steps: 4500, description: "4,500 steps" },
+                    { day: 4, steps: 5000, description: "5,000 steps!" },
+                    { day: 5, steps: 5500, description: "🏆 5K milestone!" }
+                ]
+            }
+        ];
+
+        // App state
+        let appState = {
+            currentLevel: 0,
+            currentDay: 0,
+            stepsToday: 0,
+            totalSteps: 0,
+            streak: 0,
+            lastCompletedDate: null
+        };
+
+        function loadProgress() {
+            const saved = localStorage.getItem('firstStepsProgress');
+            if (saved) {
+                appState = JSON.parse(saved);
+            }
+        }
+
+        function saveProgress() {
+            localStorage.setItem('firstStepsProgress', JSON.stringify(appState));
+        }
+
+        function getCurrentGoal() {
+            if (appState.currentLevel >= levels.length) return 5500;
+            const level = levels[appState.currentLevel];
+            if (appState.currentDay >= level.days.length) {
+                return level.days[level.days.length - 1].steps;
+            }
+            return level.days[appState.currentDay].steps;
+        }
+
+        function addSteps(count) {
+            if (appState.currentLevel >= levels.length) {
+                alert("🎉 Congratulations! You've completed the entire program!");
+                return;
+            }
+            
+            const goal = getCurrentGoal();
+            appState.stepsToday = Math.min(appState.stepsToday + count, goal);
+            appState.totalSteps += count;
+            
+            // Haptic feedback if available
+            if (window.navigator.vibrate) {
+                window.navigator.vibrate(10);
+            }
+            
+            updateDisplay();
+            saveProgress();
+            
+            if (appState.stepsToday >= goal) {
+                setTimeout(() => {
+                    if (confirm("🎉 You've reached today's goal! Complete this day?")) {
+                        completeDay();
+                    }
+                }, 300);
+            }
+        }
+
+        function completeDay() {
+            if (appState.currentLevel >= levels.length) {
+                alert("You've already completed the program! 🏆");
+                return;
+            }
+            
+            const goal = getCurrentGoal();
+            if (appState.stepsToday < goal) {
+                if (!confirm(`You've only done ${appState.stepsToday} of ${goal} steps. Complete anyway?`)) {
+                    return;
+                }
+            }
+            
+            const today = new Date().toDateString();
+            if (appState.lastCompletedDate === today) {
+                alert("You've already completed today's session. Come back tomorrow!");
+                return;
+            }
+            
+            const yesterday = new Date(Date.now() - 86400000).toDateString();
+            if (appState.lastCompletedDate === yesterday || appState.lastCompletedDate === null) {
+                appState.streak++;
+            } else {
+                appState.streak = 1;
+            }
+            
+            appState.lastCompletedDate = today;
+            
+            const level = levels[appState.currentLevel];
+            if (appState.currentDay < level.days.length - 1) {
+                appState.currentDay++;
+            } else {
+                if (appState.currentLevel < levels.length - 1) {
+                    appState.currentLevel++;
+                    appState.currentDay = 0;
+                } else {
+                    appState.currentLevel++;
+                }
+            }
+            
+            appState.stepsToday = 0;
+            
+            // Celebration haptic
+            if (window.navigator.vibrate) {
+                window.navigator.vibrate([100, 50, 100]);
+            }
+            
+            updateDisplay();
+            saveProgress();
+            
+            if (appState.currentLevel >= levels.length) {
+                alert("🏆 AMAZING! You've completed the entire First Steps program! You're ready for Couch to 5K!");
+            }
+        }
+
+        function renderLevelDots() {
+            const container = document.getElementById('levelDots');
+            container.innerHTML = levels.map((level, index) => {
+                let className = 'upcoming';
+                if (index < appState.currentLevel) className = 'completed';
+                else if (index === appState.currentLevel) className = 'current';
+                return `<div class="level-dot ${className}">${index + 1}</div>`;
+            }).join('');
+        }
+
+        function renderLevelDetails() {
+            const detailsDiv = document.getElementById('levelDetails');
+            if (appState.currentLevel >= levels.length) {
+                detailsDiv.innerHTML = `
+                    <h3>🏆 Program Complete!</h3>
+                    <p style="color: #666;">You've finished all levels. Amazing work!</p>
+                    <p style="color: #888; font-size: 14px; margin-top: 10px;">Total steps taken: ${appState.totalSteps}</p>
+                `;
+                return;
+            }
+            
+            const level = levels[appState.currentLevel];
+            detailsDiv.innerHTML = `
+                <h3>${level.name} - Level ${appState.currentLevel + 1}</h3>
+                ${level.days.map((day, index) => {
+                    let rowClass = '';
+                    if (index < appState.currentDay) rowClass = 'completed-day';
+                    else if (index === appState.currentDay) rowClass = 'current-day';
+                    return `
+                        <div class="day-row ${rowClass}">
+                            <span>Day ${day.day}</span>
+                            <span>${day.steps} steps</span>
+                            <span>${index < appState.currentDay ? '✅' : index === appState.currentDay ? '📍' : ''}</span>
+                        </div>
+                    `;
+                }).join('')}
+            `;
+        }
+
+        function updateMotivation() {
+            const messages = [
+                "Every journey begins with a single step. You've got this! 🌟",
+                "Small steps lead to big changes. Keep going! 💪",
+                "You're doing amazing! Progress, not perfection. 🌈",
+                "Each step is a victory. Celebrate your journey! 🎉",
+                "The only bad workout is the one that didn't happen. You showed up! 🏃",
+                "Your future self will thank you for these steps. Keep moving! ❤️"
+            ];
+            document.getElementById('motivation').textContent = 
+                messages[Math.floor(Math.random() * messages.length)];
+        }
+
+        function updateDisplay() {
+            const goal = getCurrentGoal();
+            const progress = goal > 0 ? (appState.stepsToday / goal) * 100 : 0;
+            
+            document.getElementById('currentGoal').textContent = goal;
+            document.getElementById('progressFill').style.width = progress + '%';
+            document.getElementById('progressText').textContent = 
+                `${appState.stepsToday} of ${goal} steps completed`;
+            document.getElementById('totalSteps').textContent = appState.totalSteps;
+            document.getElementById('currentStreak').textContent = appState.streak;
+            document.getElementById('levelDisplay').textContent = 
+                appState.currentLevel >= levels.length ? '🏆' : appState.currentLevel + 1;
+            
+            renderLevelDots();
+            renderLevelDetails();
+            updateMotivation();
+        }
+
+        function resetProgress() {
+            if (confirm('Are you sure you want to reset all progress? This cannot be undone.')) {
+                appState = {
+                    currentLevel: 0,
+                    currentDay: 0,
+                    stepsToday: 0,
+                    totalSteps: 0,
+                    streak: 0,
+                    lastCompletedDate: null
+                };
+                updateDisplay();
+                saveProgress();
+            }
+        }
+
+        // Initialize
+        loadProgress();
+        updateDisplay();
+
+        // Reset steps if it's a new day
+        const today = new Date().toDateString();
+        if (appState.lastCompletedDate && appState.lastCompletedDate !== today) {
+            appState.stepsToday = 0;
+            saveProgress();
+            updateDisplay();
+        }
+    </script>
+</body>
+</html>
